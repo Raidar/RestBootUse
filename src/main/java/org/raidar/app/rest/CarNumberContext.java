@@ -5,7 +5,7 @@ import org.raidar.app.data.CarNumber;
 import java.util.HashMap;
 import java.util.Random;
 
-public class CarNumberHandler {
+public class CarNumberContext {
 
 	public static final int SERIES_LENGTH = 3;
 	public static final int DIGITS_LENGTH = 3;
@@ -30,7 +30,7 @@ public class CarNumberHandler {
 
 	public static final CarNumber NULL_NUMBER = new CarNumber(SERIES_ZERO, DIGITS_ZERO, REGION);
 
-	public CarNumberHandler () {
+	public CarNumberContext () {
 		// WARN: Static class or Simple class?
 	}
 
@@ -163,12 +163,28 @@ public class CarNumberHandler {
 		return LETTERS.charAt(randomLetterInt(random));
 	}
 
+	public String randomSeries (Random random) {
+		StringBuilder seriesBuilder = new StringBuilder();
+		for (int i = 0; i < SERIES_LENGTH; i++) {
+			seriesBuilder.append(randomLetter(random));
+		}
+
+		return seriesBuilder.toString();
+	}
+
 	private int randomDigitsInt (Random random) {
 		return DIGITS_MIN + random.nextInt(DIGITS_MAX - DIGITS_MIN + 1);
 	}
 
 	public String randomDigits (Random random) {
 		return formatDigits(randomDigitsInt(random));
+	}
+
+	public CarNumber randomNumber (Random random) {
+		String series = handler.randomSeries(random);
+		String digits = handler.randomDigits(random);
+
+		return new CarNumber(series, digits, REGION);
 	}
 
 	public String nextSeries (String oldSeries) {
@@ -206,5 +222,24 @@ public class CarNumberHandler {
 	public String nextDigits (String oldDigits) {
 		int newDigits = Integer.parseInt(oldDigits, 10) + 1;
 		return (newDigits > DIGITS_MAX) ? null : formatDigits(newDigits);
+	}
+
+	public CarNumber nextNumber (CarNumber current) {
+
+		String oldSeries = current.getSeries();
+		String newSeries;
+		String newDigits = nextDigits(current.getDigits());
+		if (newDigits == null) {
+			newDigits = formatStartDigits();
+
+			newSeries = nextSeries(oldSeries);
+			if (newSeries == null) {
+				throw new RuntimeException("Превышен лимит номерных знаков внутри региона");
+			}
+		} else {
+            newSeries = oldSeries;
+		}
+
+		return new CarNumber(newSeries, newDigits, current.getRegion());
 	}
 }

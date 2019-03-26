@@ -1,10 +1,10 @@
 package org.raidar.app.data;
 
-import org.raidar.app.rest.CarNumberHandler;
+import org.raidar.app.rest.CarNumberContext;
 
 public class CarNumber {
 
-	private static final CarNumberHandler handler = new CarNumberHandler();
+	private static final CarNumberContext handler = new CarNumberContext();
 
 	private String series;
 	private String digits;
